@@ -1,3 +1,3 @@
 # Random
-play tic tac toe with a dumb computer
-multiply matrices with allowed dimensions
+1. play tic tac toe with a dumb computer
+2. multiply matrices with allowed dimensions
