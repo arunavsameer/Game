@@ -8,90 +8,109 @@ using namespace std;
 #define KB_LEFT 75
 #define KB_RIGHT 77
 #define KB_DOWN 80
+#define HEIGHT 20
+#define WIDTH 40
 
-//use a deque or a vector to store the data of the snake... remove the last and add to the head (vector/deque <pair <int, int>>)... no need of pair head and tail
 //look for better approach than clear screen and printing due to cursor movment... and add time interval for refreshing the screen
-//try to make the board squareish...
+//add the fruit logic and score system
 
 class game{
-    char board[20][20];
-    pair<int, int> head;
-    pair<int, int> tail;
-    int direction = KB_RIGHT;
+    char board[HEIGHT][WIDTH];
+    deque <pair <int, int>> snake;
+    int dir = KB_LEFT;
+    bool gameOver = false;
+    int score = 0;
 
 public:    
     void reset_board(){
-        for(int i = 0; i < 20; i++){
-            for(int j = 0; j < 20; j++){
+        for(int i = 0; i < HEIGHT; i++){
+            for(int j = 0; j < WIDTH; j++){
                 board[i][j] = ' ';
             }
         }
     }
 
     void start_game(){
-        board[10][10] = '#';
-       // board[10][11] = '#';
-        head = make_pair(10, 10);
-        //tail = make_pair(10, 10);
+        snake.push_front(make_pair(10, 10));
+        snake.push_back(make_pair(10, 9));  
+        snake.push_back(make_pair(10, 8));
+    }
+
+    void take_input(){
+        if (_kbhit()){
+            switch (_getch())
+            {
+            case KB_LEFT:
+                dir = KB_LEFT;
+                break;
+            case KB_RIGHT:
+                dir = KB_RIGHT;
+                break;
+            case KB_UP:
+                dir = KB_UP;
+                break;
+            case KB_DOWN:
+                dir = KB_DOWN;
+                break;
+            case 'x':
+                gameOver = true;
+                break;
+            }
+        }
     }
 
     void move_snake(){
-        if(kbhit){
-            direction = getch();
-        }
-        switch (direction){
+        switch (dir){
             case KB_UP:
                 int new_first;
-                if(head.first == 0){
-                    new_first = 19;
+                if(snake.at(0).first == 0){
+                    new_first = HEIGHT - 1;
                 }else{
-                    new_first = head.first - 1;
+                    new_first = snake.at(0).first - 1;
                 }
 
-                board[head.first][head.second] = ' ';
-                board[new_first][head.second] = '#';
-                head = make_pair((new_first), head.second);
-            break;
+                snake.push_front(make_pair(new_first, snake.at(0).second));
+                break;
 
             case KB_DOWN:
-                board[head.first][head.second] = ' ';
-                board[(head.first + 1) % 20][head.second] = '#';
-                head = make_pair(((head.first + 1) % 20), head.second);                 
-            break;
+                snake.push_front(make_pair((snake.at(0).first + 1) % HEIGHT, snake.at(0).second));
+                break;
 
             case KB_RIGHT:
-                board[head.first][head.second] = ' ';
-                board[head.first][(head.second + 1) % 20] = '#';  
-                head = make_pair(head.first, ((head.second + 1) % 20));      
-            break;
+                snake.push_front(make_pair(snake.at(0).first, (snake.at(0).second) + 1 % WIDTH));
+                break;
 
             case KB_LEFT:
-                board[head.first][head.second] = ' ';
-                board[head.first][(head.second - 1) % 20] = '#';
-                head = make_pair(head.first, ((head.second - 1) % 20));                    
-            break;
+                snake.push_front(make_pair(snake.at(0).first, (snake.at(0).second - 1) % WIDTH));
+                break;
 
             default:
                 break;
-        }     
+        }
+        snake.pop_back();
     }
 
     void print_board(){
-        cout << "----------------------";
+        for(auto i : snake){
+            board[i.first][i.second] = '#';
+        }
+        for(int i = 0; i < WIDTH + 2; i++){
+            cout << '-';
+        }
         cout << endl;
-        for(int i = 0; i < 20; i++){
+        for(int i = 0; i < HEIGHT; i++){
             cout << '=';
-            for(int j = 0; j < 20; j++){
+            for(int j = 0; j < WIDTH; j++){
                 cout << board[i][j];
             }
             cout << '=';
             cout << endl;
         }
-        cout << "----------------------";
+        for(int i = 0; i < WIDTH + 2; i++){
+            cout << '-';
+        }
     }
 };
-
-
 
 int main(){
     game g;
@@ -99,7 +118,9 @@ int main(){
     g.start_game();
     while(1){
         g.print_board();
+        g.take_input();
         g.move_snake();
+        g.reset_board();
         system("cls");
     }
 }
