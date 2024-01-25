@@ -17,6 +17,7 @@ class game{
     char board[HEIGHT][WIDTH];
     deque <pair <int, int>> snake;
     int dir = KB_RIGHT;
+    int prev_dir = KB_RIGHT;
     int score = 0;
 
 public:    
@@ -36,7 +37,7 @@ public:
         snake.push_front(make_pair(10, 10));
         snake.push_back(make_pair(10, 9));  
         snake.push_back(make_pair(10, 8));
-        board[rand() % HEIGHT][rand() % WIDTH] = '*'; //use for two fruits at a time
+        board[rand() % HEIGHT][rand() % WIDTH] = '*';
     }
 
     void take_input(){
@@ -44,16 +45,28 @@ public:
             switch (_getch())
             {
             case KB_LEFT:
-                dir = KB_LEFT;
+                if(prev_dir != KB_RIGHT){
+                    dir = KB_LEFT;
+                    prev_dir = KB_LEFT;
+                }
                 break;
             case KB_RIGHT:
-                dir = KB_RIGHT;
+                if(prev_dir != KB_LEFT){
+                    dir = KB_RIGHT;
+                    prev_dir = KB_RIGHT;
+                }
                 break;
             case KB_UP:
-                dir = KB_UP;
+                if(prev_dir != KB_DOWN){
+                    dir = KB_UP;
+                    prev_dir = KB_UP;
+                }
                 break;
             case KB_DOWN:
-                dir = KB_DOWN;
+                if(prev_dir != KB_UP){
+                    dir = KB_DOWN;
+                    prev_dir = KB_DOWN;
+                }
                 break;
             case 'x':
                 gameOver = true;
@@ -124,7 +137,7 @@ public:
     }
 
     void show_score(){
-        cout << "Game Over!" << endl << "score: " << snake.size() - 3 <<endl;
+        cout <<endl <<  "Game Over!" << endl << "score: " << snake.size() - 3 <<endl;
     }
 };
 
