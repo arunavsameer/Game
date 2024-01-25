@@ -11,21 +11,23 @@ using namespace std;
 #define HEIGHT 20
 #define WIDTH 40
 
-//look for better approach than clear screen and printing due to cursor movment... and add time interval for refreshing the screen
-//add the fruit logic and score system
+//try to add time interval 
 
 class game{
     char board[HEIGHT][WIDTH];
     deque <pair <int, int>> snake;
-    int dir = KB_LEFT;
-    bool gameOver = false;
+    int dir = KB_RIGHT;
     int score = 0;
 
 public:    
+    bool gameOver = false;
+
     void reset_board(){
         for(int i = 0; i < HEIGHT; i++){
             for(int j = 0; j < WIDTH; j++){
-                board[i][j] = ' ';
+                if(board[i][j] != '*'){
+                    board[i][j] = ' ';
+                }
             }
         }
     }
@@ -34,6 +36,7 @@ public:
         snake.push_front(make_pair(10, 10));
         snake.push_back(make_pair(10, 9));  
         snake.push_back(make_pair(10, 8));
+        //board[rand() % HEIGHT][rand() % WIDTH] = '*'; use for two fruits at a time
     }
 
     void take_input(){
@@ -59,35 +62,44 @@ public:
         }
     }
 
-    void move_snake(){
+    void play_game(){
         switch (dir){
             case KB_UP:
                 int new_first;
-                if(snake.at(0).first == 0){
+                if(snake.front().first == 0){
                     new_first = HEIGHT - 1;
                 }else{
-                    new_first = snake.at(0).first - 1;
+                    new_first = snake.front().first - 1;
                 }
 
-                snake.push_front(make_pair(new_first, snake.at(0).second));
+                snake.push_front(make_pair(new_first, snake.front().second));
                 break;
 
             case KB_DOWN:
-                snake.push_front(make_pair((snake.at(0).first + 1) % HEIGHT, snake.at(0).second));
+                snake.push_front(make_pair((snake.front().first + 1) % HEIGHT, snake.front().second));
                 break;
 
             case KB_RIGHT:
-                snake.push_front(make_pair(snake.at(0).first, (snake.at(0).second) + 1 % WIDTH));
+                snake.push_front(make_pair(snake.front().first, (snake.front().second) + 1 % WIDTH));
                 break;
 
             case KB_LEFT:
-                snake.push_front(make_pair(snake.at(0).first, (snake.at(0).second - 1) % WIDTH));
+                snake.push_front(make_pair(snake.front().first, (snake.front().second - 1) % WIDTH));
                 break;
 
             default:
                 break;
         }
-        snake.pop_back();
+        
+        if(board[snake.front().first][snake.front().second] != '*'){
+            snake.pop_back();
+        }else{
+            board[rand() % HEIGHT][rand() % WIDTH] = '*';
+        }
+
+        if(board[snake.front().first][snake.front().second] == '#'){
+            gameOver = true;
+        }
     }
 
     void print_board(){
@@ -110,17 +122,25 @@ public:
             cout << '-';
         }
     }
+
+    void show_score(){
+        cout << "Game Over!" << endl << "score: " << snake.size() - 3 <<endl;
+    }
 };
 
 int main(){
     game g;
+    srand(time(0));
     g.reset_board();
     g.start_game();
-    while(1){
-        g.print_board();
+    while(!g.gameOver){
         g.take_input();
-        g.move_snake();
+        g.print_board();
+        g.play_game();
         g.reset_board();
-        system("cls");
+        if(!g.gameOver){
+            system("cls");
+        }
     }
+    g.show_score();
 }
