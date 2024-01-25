@@ -36,7 +36,7 @@ public:
         snake.push_front(make_pair(10, 10));
         snake.push_back(make_pair(10, 9));  
         snake.push_back(make_pair(10, 8));
-        //board[rand() % HEIGHT][rand() % WIDTH] = '*'; use for two fruits at a time
+        board[rand() % HEIGHT][rand() % WIDTH] = '*'; //use for two fruits at a time
     }
 
     void take_input(){
